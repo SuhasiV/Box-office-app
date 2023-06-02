@@ -1,7 +1,13 @@
 import { useState } from 'react';
+import { searchForShows } from './../api/tvmaze';
 
 const Home = () => {
   const [searchStr, setSearchStr] = useState('');
+  const [apiData, setApiData] = useState(null);
+  //const [apiData, setApiData] = useState([]);
+  const [apiDataError, setapiDataError] = useState(null);
+
+  console.log(apiDataError);
 
   const onSerchInputChange = ev => {
     setSearchStr(ev.target.value);
@@ -10,23 +16,37 @@ const Home = () => {
   const onSearch = async ev => {
     ev.preventDefault();
 
-    //fetch('https://api.tvmaze.com/search/shows?q=girls')
-    //  .then(response => response.json())
-    //  .then(body => console.log(body));
+    try {
+      setapiDataError(null);
 
-    const response = await fetch(
-      `https://api.tvmaze.com/search/shows?q=${searchStr}`
-    );
-    const body = await response.json();
-    console.log(body);
+      const result = await searchForShows(searchStr);
+      setApiData(result);
+    } catch (error) {
+      setapiDataError(error);
+    }
+  };
+
+  const renderApiData = () => {
+    if (apiDataError) {
+      return <div>Error occured: {apiDataError.message}</div>;
+    }
+
+    if (apiData) {
+      return apiData.map(data => (
+        <div key={data.show.id}>{data.show.name}</div>
+      ));
+    }
+
+    return null;
   };
 
   return (
     <div>
       <form onSubmit={onSearch}>
         <input type="text" value={searchStr} onChange={onSerchInputChange} />
-        <button type="submit">Update to random</button>
+        <button type="submit">Search</button>
       </form>
+      <div>{renderApiData()}</div>
     </div>
   );
 };
