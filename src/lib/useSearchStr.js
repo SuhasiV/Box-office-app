@@ -13,6 +13,8 @@ const usePersistedState = (initialState, sessionStorageKey) => {
   return [state, setState];
 };
 
-export const useSearchStr = () => {
+const useSearchStr = () => {
   return usePersistedState('', 'searchString');
 };
+
+export default useSearchStr;
